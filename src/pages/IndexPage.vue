@@ -54,17 +54,20 @@ export default {
 
   setup() {
     const search = ref('');
+    // ------新增欄位v-model
     const name = ref('');
     const phone = ref('');
     const email = ref('');
     const gender = ref('');
     const birthday = ref('');
     const rowsData = ref({});
+    // ------
 
     const unWrite = ref(false);
     const check = ref(false);
     const add = ref(false);
     const confirmed = ref(false);
+    // 清空
     const isEmpty = () => {
       name.value = '';
       phone.value = '';
@@ -72,6 +75,7 @@ export default {
       gender.value = '';
       birthday.value = '';
     }
+    // 賦值加空值判斷
     const setValue = () => {
       rowsData.value = {
         name: name.value.trim() === '' || name.value.length === 0 ? unWrite.value = true : name.value,
@@ -81,6 +85,7 @@ export default {
         birthday: birthday.value.trim() === '' || birthday.value.length === 0 ? unWrite.value = true : birthday.value.split('-').join('/'),
       }
     }
+    // 刪除鍵系列
     const dlAccess = (el) => {
       const res = state.rows.filter((item) => {
         return !el.includes(item)
@@ -98,15 +103,12 @@ export default {
       memNum.value = el.length;
       check.value = true;
     }
-
-    const addButton = (el) => {
-      add.value = true;
-    }
+    // 新增鍵系列
     const addAccess = () => {
       setValue();
       if (unWrite.value) {
         alert('有欄位忘記填囉')
-        unWrite.value = !unWrite.value;
+        unWrite.value = false;
         return
       }
       state.rows.unshift(rowsData.value);
@@ -117,7 +119,10 @@ export default {
       isEmpty();
       add.value = false;
     }
-
+    const addButton = () => {
+      add.value = true;
+    }
+    // 父子傳值
     const isSelected = ref([]);
     const getSelected = (data) => {
       isSelected.value = data;
@@ -163,14 +168,14 @@ export default {
       ],
       rows: [],
     });
-
+    // 日期顯示轉換
     const convertDate = (day) => {
       const datLength = [4, 2, 2];
       return day.split(/-|T/).slice(0, 3).map((date, index) => {
         return date.padStart(datLength[index], '0');
       }).join('/');
     }
-
+    // Get Api Data
     const memberData = async () => {
       fetch('http://35.194.177.50:7777/members')
         .then((res) => res.json())
@@ -181,25 +186,22 @@ export default {
           state.rows = data.members;
         })
     }
-
-
-
-    // eslint-disable-next-line vue/return-in-computed-property
+    // 搜尋篩選
     const filterRows = computed(() => {
-      if(search.value){
+      if (search.value) {
         return state.rows.filter((item) => item.name === search.value)
-      }else{
+      } else {
         return state.rows
       }
     })
 
-  onMounted(async () => {
-  await memberData();
-})
+    onMounted(async () => {
+      await memberData();
+    })
 
-return {
-  filterRows, search, unWrite, setValue, isEmpty, rowsData, name, phone, email, gender, birthday, addButton, state, getSelected, isSelected, dlButton, memNum, check, confirmed, dlAccess, dlCancel, add, addAccess, addCancel
-}
+    return {
+      filterRows, search, unWrite, setValue, isEmpty, rowsData, name, phone, email, gender, birthday, addButton, state, getSelected, isSelected, dlButton, memNum, check, confirmed, dlAccess, dlCancel, add, addAccess, addCancel
+    }
   }
 };
 </script>
@@ -232,7 +234,6 @@ return {
       cursor: pointer;
       display: flex;
       align-items: center;
-      box-shadow: 0px 0px 3px #00000550;
     }
 
     .access {
@@ -244,7 +245,6 @@ return {
       background-color: #2c88d9;
       display: flex;
       align-items: center;
-      box-shadow: 0px 0px 3px #00000550;
     }
   }
 
@@ -255,7 +255,6 @@ return {
     padding: 40px 50px;
     border: solid 2px #c3cfd9;
     border-radius: 5px;
-    box-shadow: 0px 0px 3px #00000550;
 
     input {
       margin-bottom: 20px;
@@ -296,7 +295,6 @@ return {
       display: flex;
       justify-content: space-evenly;
 
-      // outline: solid 1px #000;
       .cancel {
         padding: 5px 40px;
         border: solid 2px #bec4ca;
@@ -317,5 +315,4 @@ return {
       }
     }
   }
-}
-</style>
+}</style>

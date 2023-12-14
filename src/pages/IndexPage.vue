@@ -30,18 +30,19 @@
     <div class="block-item">
       <div class="row justify-between items-center">
         <div class="text-h6">員工基本資訊</div>
+        <input v-model="search" @keyup="filterRows" type="text" placeholder="姓名">
         <div>
           <q-btn class="q-mr-sm" @click="addButton" color="primary" label="新增" />
           <q-btn color="white" @click="dlButton(isSelected)" text-color="black" label="刪除" />
         </div>
       </div>
-      <QTable @getSelected="getSelected" :isSelected="isSelected" :columns="state.columns" :rows="state.rows" />
+      <QTable @getSelected="getSelected" :isSelected="isSelected" :columns="state.columns" :rows="filterRows" />
     </div>
   </q-page>
 </template>
 
 <script>
-import { ref, reactive, onMounted } from 'vue';
+import { ref, reactive, onMounted, computed } from 'vue';
 import QTable from 'src/components/QTable.vue';
 
 export default {
@@ -52,6 +53,7 @@ export default {
   },
 
   setup() {
+    const search = ref('');
     const name = ref('');
     const phone = ref('');
     const email = ref('');
@@ -72,11 +74,11 @@ export default {
     }
     const setValue = () => {
       rowsData.value = {
-        name: name.value.trim() === '' || name.value.length === 0? unWrite.value = !unWrite.value : name.value,
-        cellphone: phone.value.trim() === '' || phone.value.length === 0? unWrite.value = !unWrite.value : phone.value,
-        email: email.value.trim() === '' || email.value.length === 0? unWrite.value = !unWrite.value : email.value,
-        gender: gender.value.trim() === '' || gender.value.length === 0? unWrite.value = !unWrite.value : gender.value,
-        birthday: birthday.value.trim() === '' || birthday.value.length === 0? unWrite.value = !unWrite.value : birthday.value.split('-').join('/'),
+        name: name.value.trim() === '' || name.value.length === 0 ? unWrite.value = true : name.value,
+        cellphone: phone.value.trim() === '' || phone.value.length === 0 ? unWrite.value = true : phone.value,
+        email: email.value.trim() === '' || email.value.length === 0 ? unWrite.value = true : email.value,
+        gender: gender.value.trim() === '' || gender.value.length === 0 ? unWrite.value = true : gender.value,
+        birthday: birthday.value.trim() === '' || birthday.value.length === 0 ? unWrite.value = true : birthday.value.split('-').join('/'),
       }
     }
     const dlAccess = (el) => {
@@ -102,7 +104,7 @@ export default {
     }
     const addAccess = () => {
       setValue();
-      if(unWrite.value){
+      if (unWrite.value) {
         alert('有欄位忘記填囉')
         unWrite.value = !unWrite.value;
         return
@@ -179,13 +181,25 @@ export default {
           state.rows = data.members;
         })
     }
-    onMounted(async () => {
-      await memberData();
+
+
+
+    // eslint-disable-next-line vue/return-in-computed-property
+    const filterRows = computed(() => {
+      if(search.value){
+        return state.rows.filter((item) => item.name === search.value)
+      }else{
+        return state.rows
+      }
     })
 
-    return {
-      unWrite, setValue, isEmpty, rowsData, name, phone, email, gender, birthday, addButton, state, getSelected, isSelected, dlButton, memNum, check, confirmed, dlAccess, dlCancel, add, addAccess, addCancel
-    }
+  onMounted(async () => {
+  await memberData();
+})
+
+return {
+  filterRows, search, unWrite, setValue, isEmpty, rowsData, name, phone, email, gender, birthday, addButton, state, getSelected, isSelected, dlButton, memNum, check, confirmed, dlAccess, dlCancel, add, addAccess, addCancel
+}
   }
 };
 </script>
